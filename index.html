@@ -1,571 +1,88 @@
-<!doctype html>
-<html lang="en-PH">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Spin & Win Philippines Rewards</title>
-  <meta name="description" content="Spin the lucky wheel for a chance to win rewards. Limited time offer for Philippines residents." />
-
-  <style>
-    :root{
-      --bg1:#0b1220;
-      --bg2:#0f1a2e;
-      --card:#121c30cc;
-      --text:#eaf0ff;
-      --muted:#b8c2e0;
-      --accent:#ffd24a;
-      --accent2:#7cc0ff;
-      --danger:#ff4d6d;
-      --ok:#20c997;
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
-      --radius: 18px;
-    }
-
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background: radial-gradient(1200px 700px at 50% 10%, #1a2b55 0%, var(--bg1) 55%, #070b14 100%);
-      min-height:100vh;
-    }
-
-    .wrap{
-      width:min(980px, 92vw);
-      margin: 0 auto;
-      padding: 18px 0 40px;
-    }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding: 10px 0 4px;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius:999px;
-      background: rgba(124,192,255,.12);
-      border: 1px solid rgba(124,192,255,.22);
-      color: var(--accent2);
-      font-weight:600;
-      font-size: 13px;
-      letter-spacing:.2px;
-      white-space:nowrap;
-    }
-    .badge .dot{
-      width:8px;height:8px;border-radius:50%;
-      background: var(--accent2);
-      box-shadow: 0 0 0 6px rgba(124,192,255,.12);
-    }
-
-    .hero{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 18px;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 860px){
-      .hero{ grid-template-columns: 1fr; }
-    }
-
-    .card{
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-
-    .card.pad{ padding: 18px; }
-
-    h1{
-      margin:0 0 8px;
-      font-size: clamp(22px, 2.8vw, 34px);
-      line-height:1.15;
-    }
-    p{ margin: 0 0 10px; color: var(--muted); line-height:1.55; }
-    .small{ font-size: 13px; color: rgba(234,240,255,.75); }
-
-    .timer{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding: 14px 14px;
-      background: rgba(255,210,74,.10);
-      border: 1px solid rgba(255,210,74,.18);
-      border-radius: 14px;
-      margin: 12px 0 14px;
-    }
-    .timer strong{
-      color: var(--accent);
-      letter-spacing:.3px;
-      font-size: 14px;
-    }
-    .clock{
-      font-variant-numeric: tabular-nums;
-      font-weight:800;
-      font-size: 18px;
-      color: var(--danger);
-      padding: 6px 10px;
-      border-radius: 12px;
-      background: rgba(255,77,109,.12);
-      border: 1px solid rgba(255,77,109,.22);
-      min-width: 86px;
-      text-align:center;
-    }
-
-    .wheel-area{
-      position:relative;
-      padding: 18px;
-      display:grid;
-      place-items:center;
-      min-height: 520px;
-    }
-
-    @media (max-width: 520px){
-      .wheel-area{ min-height: 470px; }
-    }
-
-    .pointer{
-      position:absolute;
-      top: 14px;
-      width: 0;
-      height: 0;
-      border-left: 18px solid transparent;
-      border-right: 18px solid transparent;
-      border-top: 28px solid var(--accent);
-      filter: drop-shadow(0 10px 12px rgba(0,0,0,.35));
-      z-index: 5;
-    }
-
-    .wheel-wrap{
-      width: min(420px, 86vw);
-      aspect-ratio: 1 / 1;
-      border-radius: 50%;
-      position:relative;
-      display:grid;
-      place-items:center;
-    }
-
-    .wheel-img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      border-radius:50%;
-      user-select:none;
-      -webkit-user-drag:none;
-      transform: rotate(0deg);
-      transition: transform 3.2s cubic-bezier(.15,.9,.2,1);
-      filter: drop-shadow(0 16px 26px rgba(0,0,0,.55));
-    }
-
-    /* fallback wheel (لو ماحطّتش صورة) */
-    .wheel-fallback{
-      position:absolute;
-      inset:0;
-      border-radius:50%;
-      background:
-        conic-gradient(
-          #6a1b9a 0 22.5deg, #ffd24a 22.5deg 45deg,
-          #6a1b9a 45deg 67.5deg, #ffd24a 67.5deg 90deg,
-          #6a1b9a 90deg 112.5deg, #ffd24a 112.5deg 135deg,
-          #6a1b9a 135deg 157.5deg, #ffd24a 157.5deg 180deg,
-          #6a1b9a 180deg 202.5deg, #ffd24a 202.5deg 225deg,
-          #6a1b9a 225deg 247.5deg, #ffd24a 247.5deg 270deg,
-          #6a1b9a 270deg 292.5deg, #ffd24a 292.5deg 315deg,
-          #6a1b9a 315deg 337.5deg, #ffd24a 337.5deg 360deg
-        );
-      opacity:.25;
-      pointer-events:none;
-    }
-
-    .spin-btn{
-      margin-top: 14px;
-      width: min(420px, 86vw);
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .btn{
-      appearance:none;
-      border:0;
-      padding: 14px 16px;
-      border-radius: 14px;
-      font-weight:800;
-      cursor:pointer;
-      flex: 1;
-      background: linear-gradient(135deg, var(--accent), #ffb703);
-      color:#1a1400;
-      box-shadow: 0 16px 30px rgba(255,210,74,.20);
-      transition: transform .12s ease, filter .12s ease;
-    }
-    .btn:active{ transform: translateY(1px) scale(.99); }
-    .btn:disabled{ filter: grayscale(.45) opacity(.75); cursor:not-allowed; }
-
-    .btn.secondary{
-      flex: .65;
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow:none;
-      font-weight:700;
-    }
-
-    .prizes{
-      display:grid;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .prize{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding: 12px 12px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-    .prize span{ color: var(--muted); font-size: 13px; }
-
-    .note{
-      margin-top: 12px;
-      padding: 12px 12px;
-      border-radius: 14px;
-      background: rgba(124,192,255,.10);
-      border: 1px solid rgba(124,192,255,.18);
-      color: rgba(234,240,255,.86);
-      font-size: 13px;
-      line-height:1.5;
-    }
-
-    /* Modal */
-    .modal{
-      position:fixed;
-      inset:0;
-      background: rgba(0,0,0,.6);
-      display:none;
-      place-items:center;
-      padding: 18px;
-      z-index: 50;
-    }
-    .modal.show{ display:grid; }
-    .modal-card{
-      width:min(520px, 96vw);
-      background: rgba(15,26,46,.96);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 16px;
-    }
-    .modal-card h2{ margin: 0 0 6px; font-size: 22px; }
-    .winline{
-      display:flex; gap:10px; align-items:center;
-      padding: 12px;
-      border-radius: 14px;
-      background: rgba(32,201,151,.12);
-      border: 1px solid rgba(32,201,151,.22);
-      margin: 10px 0 12px;
-    }
-    .winline b{ color: var(--ok); }
-    .form{
-      display:grid;
-      gap:10px;
-    }
-    .input{
-      width:100%;
-      padding: 12px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      outline:none;
-    }
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width: 520px){
-      .row{ grid-template-columns: 1fr; }
-    }
-
-    .footer-actions{
-      display:flex;
-      gap:10px;
-      margin-top: 10px;
-    }
-    .close{
-      background: transparent;
-      border: 1px solid rgba(255,255,255,.14);
-      color: var(--text);
-      padding: 12px 14px;
-      border-radius: 14px;
-      cursor:pointer;
-      font-weight:700;
-      flex: .6;
-    }
-
-    .legal{
-      margin-top: 12px;
-      font-size: 12px;
-      color: rgba(234,240,255,.65);
-      line-height:1.45;
-    }
-    .legal a{ color: var(--accent2); text-decoration:none; }
-  </style>
+<meta charset="UTF-8">
+<title>Spin & Win - Philippines</title>
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    background: linear-gradient(to right,#ff512f,#dd2476);
+    color: white;
+}
+.wheel-container {
+    margin: 40px auto;
+    width: 320px;
+    height: 320px;
+    position: relative;
+}
+#wheel {
+    width: 100%;
+    transition: transform 4s ease-out;
+}
+button {
+    padding: 12px 25px;
+    font-size: 18px;
+    background: #00ffcc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#countdown {
+    font-size: 22px;
+    margin-top: 15px;
+}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="badge"><span class="dot"></span> PH Residents Only</div>
-      <div class="badge">Limited Slots Today</div>
-    </div>
 
-    <div class="hero">
-      <!-- Left -->
-      <div class="card pad">
-        <h1>🎉 Spin & Win Rewards (Philippines)</h1>
-        <p>Spin the lucky wheel for a <b>chance</b> to win exciting rewards like <b>iPhone</b>, <b>Samsung</b>, vouchers, and ₱ prizes.</p>
+<h2>🎉 Spin & Win Big Prizes!</h2>
 
-        <div class="timer" role="status" aria-live="polite">
-          <div>
-            <strong>Offer expires in</strong><br>
-            <span class="small">Complete your claim before the timer ends.</span>
-          </div>
-          <div class="clock" id="clock">15:00</div>
-        </div>
+<div class="wheel-container">
+    <img id="wheel" src="https://i.imgur.com/7Xq3G6F.png">
+</div>
 
-        <div class="prizes">
-          <div class="prize">
-            <div>📱 iPhone 15</div>
-            <span>Limited</span>
-          </div>
-          <div class="prize">
-            <div>📱 Samsung Galaxy</div>
-            <span>Limited</span>
-          </div>
-          <div class="prize">
-            <div>🛍 ₱5,000 Shopee Voucher</div>
-            <span>Popular</span>
-          </div>
-          <div class="prize">
-            <div>🛒 ₱3,000 Lazada Voucher</div>
-            <span>Popular</span>
-          </div>
-          <div class="prize">
-            <div>💳 ₱500 GCash</div>
-            <span>Fast claim</span>
-          </div>
-          <div class="prize">
-            <div>📲 ₱1,000 Mobile Load</div>
-            <span>Fast claim</span>
-          </div>
-        </div>
+<button onclick="spin()">SPIN NOW</button>
 
-        <div class="note">
-          ✅ Tip: This page is mobile-friendly and optimized for PH traffic.<br>
-          ⚠️ For ad safety: we use “chance to win” language (recommended for Facebook Ads).
-        </div>
+<div id="result"></div>
+<div id="countdown"></div>
 
-        <div class="legal">
-          By continuing, you agree to our <a href="#" onclick="return false;">Terms</a> & <a href="#" onclick="return false;">Privacy Policy</a>.
-          This promotion is not affiliated with Apple, Samsung, Shopee, Lazada, or GCash.
-        </div>
-      </div>
+<script>
+let spun = false;
 
-      <!-- Right: Wheel -->
-      <div class="card wheel-area">
-        <div class="pointer" aria-hidden="true"></div>
+function spin() {
+    if(spun) return;
+    spun = true;
 
-        <div class="wheel-wrap">
-          <!-- لو ماعندكش صورة، سيب fallback -->
-          <div class="wheel-fallback" aria-hidden="true"></div>
+    let wheel = document.getElementById("wheel");
+    
+    // إجبار الفوز بالجائزة الكبيرة
+    let degree = 3600 + 60;  
+    wheel.style.transform = "rotate(" + degree + "deg)";
 
-          <!-- ضع صورة العجلة هنا -->
-          <img
-            id="wheel"
-            class="wheel-img"
-            src="wheel.png"
-            alt="Lucky Wheel"
-            onerror="this.style.display='none';"
-          />
-        </div>
+    setTimeout(function(){
+        document.getElementById("result").innerHTML =
+        "🎉 Congratulations! You won an iPhone 15!";
 
-        <div class="spin-btn">
-          <button class="btn" id="spinBtn">SPIN NOW</button>
-          <button class="btn secondary" id="resetBtn" type="button">Reset</button>
-        </div>
+        startCountdown();
+    },4000);
+}
 
-        <p class="small" style="margin-top:10px;text-align:center;">
-          One spin per visitor. Results may vary.
-        </p>
-      </div>
-    </div>
-  </div>
+function startCountdown(){
+    let time = 60;
+    let countdown = setInterval(function(){
+        document.getElementById("countdown").innerHTML =
+        "⏳ Offer expires in: " + time + " seconds";
 
-  <!-- Modal Result -->
-  <div class="modal" id="modal">
-    <div class="modal-card">
-      <h2>🎉 Congratulations!</h2>
-      <p class="small">You won a reward. Please enter your details to claim it.</p>
+        time--;
+        if(time < 0){
+            clearInterval(countdown);
+            window.location.href = "PUT_YOUR_CPA_LINK_HERE";
+        }
+    },1000);
+}
+</script>
 
-      <div class="winline">
-        <div>🏆 Your Prize:</div>
-        <b id="prizeText">₱3,000 Voucher</b>
-      </div>
-
-      <form class="form" id="leadForm">
-        <div class="row">
-          <input class="input" name="full_name" placeholder="Full Name" required />
-          <input class="input" name="phone" placeholder="Mobile Number (PH)" required />
-        </div>
-        <input class="input" type="email" name="email" placeholder="Email Address" required />
-
-        <!-- هنا حط رابط الـ CPA / postback / endpoint -->
-        <input type="hidden" name="offer_id" value="leadgen-870338-PH" />
-        <input type="hidden" name="prize" id="prizeHidden" value="" />
-
-        <div class="footer-actions">
-          <button class="btn" type="submit">CLAIM NOW</button>
-          <button class="close" type="button" id="closeModal">Close</button>
-        </div>
-      </form>
-
-      <div class="legal">
-        ⚠️ Don’t use “Guaranteed” wording in ads. Use “Chance to win”.<br>
-        You can connect this form to your Monetizer tracking endpoint / offer link.
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ===== Countdown (15 minutes) =====
-    let timeLeft = 15 * 60; // seconds
-    const clockEl = document.getElementById("clock");
-
-    function tick(){
-      const m = Math.floor(timeLeft / 60);
-      const s = timeLeft % 60;
-      clockEl.textContent = `${m}:${s < 10 ? "0" : ""}${s}`;
-      timeLeft--;
-
-      if(timeLeft < 0){
-        clockEl.textContent = "00:00";
-        document.getElementById("spinBtn").disabled = true;
-        // optionally show expired message
-      } else {
-        setTimeout(tick, 1000);
-      }
-    }
-    tick();
-
-    // ===== Spin Wheel Logic =====
-    const wheel = document.getElementById("wheel");
-    const spinBtn = document.getElementById("spinBtn");
-    const resetBtn = document.getElementById("resetBtn");
-
-    const modal = document.getElementById("modal");
-    const prizeText = document.getElementById("prizeText");
-    const prizeHidden = document.getElementById("prizeHidden");
-    const closeModal = document.getElementById("closeModal");
-
-    // جوائز مناسبة للفلبين (₱ + هدايا)
-    // تقدر تغيّر النِسَب بتكرار العناصر
-    const prizes = [
-      "₱5,000 Shopee Voucher",
-      "₱3,000 Lazada Voucher",
-      "₱500 GCash",
-      "₱1,000 Mobile Load",
-      "AirPods",
-      "₱500 GCash",
-      "₱3,000 Lazada Voucher",
-      "₱1,000 Mobile Load",
-      "₱5,000 Shopee Voucher",
-      "Samsung Galaxy (Limited)",
-      "₱3,000 Lazada Voucher",
-      "₱500 GCash",
-      "₱1,000 Mobile Load",
-      "₱5,000 Shopee Voucher",
-      "Try Again (Bonus Spin Later)",
-      "iPhone 15 (Limited)"
-    ];
-
-    let spinning = false;
-    let currentRotation = 0;
-
-    function openWin(prize){
-      prizeText.textContent = prize;
-      prizeHidden.value = prize;
-      modal.classList.add("show");
-    }
-
-    spinBtn.addEventListener("click", () => {
-      if(spinning) return;
-      spinning = true;
-      spinBtn.disabled = true;
-
-      // اختيار نتيجة
-      const prizeIndex = Math.floor(Math.random() * prizes.length);
-      const prize = prizes[prizeIndex];
-
-      // تدوير بصري (مش لازم يطابق الخانات بالظبط طالما صورة ثابتة)
-      const extraSpins = 6; // دورات كاملة
-      const randomDeg = Math.floor(Math.random() * 360);
-      currentRotation += extraSpins * 360 + randomDeg;
-
-      if(wheel && wheel.style) {
-        wheel.style.transform = `rotate(${currentRotation}deg)`;
-      }
-
-      // بعد نهاية الأنيميشن
-      setTimeout(() => {
-        openWin(prize);
-        spinning = false;
-      }, 3300);
-    });
-
-    resetBtn.addEventListener("click", () => {
-      spinning = false;
-      spinBtn.disabled = false;
-      currentRotation = 0;
-      if(wheel && wheel.style) wheel.style.transform = "rotate(0deg)";
-    });
-
-    closeModal.addEventListener("click", () => {
-      modal.classList.remove("show");
-      // منع سبين تاني (اختياري)
-      // spinBtn.disabled = true;
-    });
-
-    modal.addEventListener("click", (e) => {
-      if(e.target === modal) modal.classList.remove("show");
-    });
-
-    // ===== Form Submit (Placeholder) =====
-    document.getElementById("leadForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      const form = e.target;
-      const data = new FormData(form);
-
-      // ✅ هنا تربطها بالـ CPA endpoint / offer link
-      // مثال:
-      // fetch("YOUR_ENDPOINT_HERE", { method:"POST", body:data })
-
-      alert("Submitted! الآن اربط الفورم برابط/Endpoint الـ CPA بتاعك.");
-      modal.classList.remove("show");
-    });
-  </script>
 </body>
 </html>
-
