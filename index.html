@@ -1,145 +1,225 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="tl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spin & Win Philippines</title>
-
-<style>
-body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background: radial-gradient(circle at top, #243b55, #141e30);
-    text-align:center;
-    color:white;
-}
-
-h1{
-    margin-top:20px;
-    font-size:32px;
-    color:#FFD700;
-}
-
-#countdown{
-    font-size:20px;
-    margin-bottom:15px;
-    color:#ffcc00;
-}
-
-.wheel-container{
-    position:relative;
-    width:400px;
-    margin:0 auto;
-}
-
-#wheel{
-    width:100%;
-    transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
-    border-radius:50%;
-    box-shadow:0 0 25px gold;
-}
-
-.pointer{
-    width:0;
-    height:0;
-    border-left:15px solid transparent;
-    border-right:15px solid transparent;
-    border-bottom:25px solid gold;
-    position:absolute;
-    top:-10px;
-    left:50%;
-    transform:translateX(-50%);
-}
-
-button{
-    margin-top:25px;
-    padding:15px 40px;
-    font-size:22px;
-    border:none;
-    border-radius:8px;
-    background:linear-gradient(45deg,#FFD700,#FFA500);
-    cursor:pointer;
-    font-weight:bold;
-}
-
-button:hover{
-    transform:scale(1.05);
-}
-
-#result{
-    margin-top:20px;
-    font-size:22px;
-    color:#00ffcc;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Philippines Lucky Spin</title>
+  <style>
+    :root{
+      --bg1:#2b0a86; --bg2:#5a18d6; --bg3:#2b4fe0;
+      --orange1:#ffbf25; --orange2:#ff8500;
+      --purple:#6c2cff; --purple2:#7e39ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+      padding:20px;
+      color:#fff;
+    }
+    .phone{
+      width:330px; height:650px;
+      background:#101018;
+      border-radius:40px;
+      padding:14px;
+      box-shadow:0 20px 60px rgba(0,0,0,.4);
+    }
+    .screen{
+      width:100%; height:100%;
+      border-radius:30px;
+      background:linear-gradient(180deg,var(--orange1),var(--orange2));
+      position:relative; overflow:hidden;
+    }
+    .notch{
+      width:120px; height:24px; background:#000;
+      position:absolute; top:10px; left:50%;
+      transform:translateX(-50%);
+      border-radius:0 0 15px 15px; opacity:.92;
+    }
+    .title{
+      text-align:center;
+      margin-top:60px;
+      font-weight:900;
+      font-size:26px;
+      letter-spacing:.3px;
+      text-shadow:0 6px 14px rgba(0,0,0,.22);
+    }
+    .sub{
+      text-align:center;
+      margin-top:6px;
+      font-weight:700;
+      font-size:13px;
+      opacity:.95;
+    }
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:13px;
+      font-weight:800;
+    }
+    .topbar{
+      margin-top:10px;
+      display:flex;
+      justify-content:center;
+    }
+    .wheelWrap{
+      position:absolute;
+      top:170px;
+      left:50%;
+      transform:translateX(-50%);
+      width:290px; height:290px;
+      display:grid; place-items:center;
+    }
+    .pointer{
+      position:absolute;
+      top:-18px; left:50%;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:15px solid transparent;
+      border-right:15px solid transparent;
+      border-bottom:30px solid rgba(255,255,255,.95);
+      z-index:3;
+    }
+    .wheel{
+      width:260px; height:260px;
+      border-radius:50%;
+      background: conic-gradient(
+        #c40000 0deg 60deg,
+        #ffcf3a 60deg 120deg,
+        #c40000 120deg 180deg,
+        #ffcf3a 180deg 240deg,
+        #c40000 240deg 300deg,
+        #ffcf3a 300deg 360deg
+      );
+      transition:transform 4.2s cubic-bezier(.12,.74,.15,1);
+      position:relative;
+    }
+    .hub{
+      position:absolute;
+      width:70px;height:70px;border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, #ffe7a8, #d7a637);
+      left:50%; top:50%; transform:translate(-50%,-50%);
+    }
+    .label{
+      position:absolute;
+      left:50%; top:50%;
+      width:50%;
+      transform-origin:0% 50%;
+      font-weight:900;
+      font-size:14px;
+      color:#fff;
+      display:flex; align-items:center;
+    }
+    .label span{
+      display:inline-block;
+      transform:rotate(90deg);
+    }
+    .btn{
+      position:absolute;
+      bottom:70px; left:50%;
+      transform:translateX(-50%);
+      width:220px; height:56px;
+      border:none; cursor:pointer;
+      border-radius:999px;
+      font-weight:900;
+      color:#fff;
+      background:linear-gradient(180deg,var(--purple2),var(--purple));
+    }
+    .fine{
+      position:absolute;
+      bottom:18px; left:0; right:0;
+      text-align:center;
+      font-size:11px;
+      opacity:.85;
+    }
+    .fine a{color:#fff}
+  </style>
 </head>
 
 <body>
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
 
-<h1>🎉 Spin & Win Philippines 🎉</h1>
-<div id="countdown"></div>
+      <div class="title">Philippines Lucky Spin 🇵🇭</div>
+      <div class="sub">I-spin upang malaman kung kwalipikado ka sa giveaway ngayon</div>
 
-<div class="wheel-container">
-    <div class="pointer"></div>
-    <img id="wheel" src="wheel.png">
-</div>
+      <div class="topbar">
+        <div class="pill">⏳ Natitirang oras: <span id="timer">05:00</span></div>
+      </div>
 
-<button onclick="spin()">SPIN</button>
+      <div class="wheelWrap">
+        <div class="pointer"></div>
+        <div class="wheel" id="wheel">
+          <div class="label" style="transform:translate(0,-50%) rotate(0deg)"><span>iPhone</span></div>
+          <div class="label" style="transform:translate(0,-50%) rotate(60deg)"><span>Samsung</span></div>
+          <div class="label" style="transform:translate(0,-50%) rotate(120deg)"><span>₱10,000</span></div>
+          <div class="label" style="transform:translate(0,-50%) rotate(180deg)"><span>Load</span></div>
+          <div class="label" style="transform:translate(0,-50%) rotate(240deg)"><span>Data</span></div>
+          <div class="label" style="transform:translate(0,-50%) rotate(300deg)"><span>Subukan Muli</span></div>
+          <div class="hub"></div>
+        </div>
+      </div>
 
-<div id="result"></div>
+      <button class="btn" id="spinBtn">I-SPIN NGAYON</button>
+
+      <div class="fine">
+        <a href="#">Privacy</a> · <a href="#">Terms</a><br/>
+        Hindi kaakibat ng Apple/Samsung. Para lamang sa mga residente ng Pilipinas.
+      </div>
+    </div>
+  </div>
 
 <script>
+const SMARTLINK_URL = "PUT_YOUR_SMARTLINK_HERE";
+
+let remaining = 5 * 60;
+const timerEl = document.getElementById("timer");
+const spinBtn = document.getElementById("spinBtn");
+
+function tick(){
+  const m = String(Math.floor(remaining / 60)).padStart(2,"0");
+  const s = String(remaining % 60).padStart(2,"0");
+  timerEl.textContent = `${m}:${s}`;
+  if(remaining <= 0){ spinBtn.disabled = true; return; }
+  remaining--;
+  setTimeout(tick, 1000);
+}
+tick();
 
 const prizes = [
-"iPhone 15 📱",
-"Samsung Galaxy 📱",
-"₱10,000",
-"₱5,000",
-"₱1,000",
-"AirPods 🎧",
-"₱500",
-"Try Again"
+  { name: "iPhone 15", weight: 4 },
+  { name: "Samsung Galaxy", weight: 6 },
+  { name: "Cash ₱10,000", weight: 10 },
+  { name: "Load", weight: 18 },
+  { name: "Data Bundle", weight: 18 },
+  { name: "Subukan Muli", weight: 44 }
 ];
 
-let deg = 0;
-
-function spin(){
-    let random = Math.floor(Math.random() * prizes.length);
-    let angle = 360 / prizes.length;
-    let spinDeg = 360 * 5 + (angle * random);
-
-    deg += spinDeg;
-    document.getElementById("wheel").style.transform = "rotate("+deg+"deg)";
-
-    setTimeout(()=>{
-        document.getElementById("result").innerHTML =
-        "🎊 Congratulations! You won: " + prizes[random];
-    },4000);
+function pickWeighted(){
+  const total = prizes.reduce((a,p)=>a+p.weight,0);
+  let r = Math.random()*total;
+  for(const p of prizes){ r-=p.weight; if(r<=0) return p.name;}
+  return prizes[prizes.length-1].name;
 }
 
-/* Countdown Timer 24 hours */
-
-let countDownDate = new Date().getTime() + (24*60*60*1000);
-
-let x = setInterval(function() {
-
-let now = new Date().getTime();
-let distance = countDownDate - now;
-
-let hours = Math.floor((distance % (1000*60*60*24))/(1000*60*60));
-let minutes = Math.floor((distance % (1000*60*60))/(1000*60));
-let seconds = Math.floor((distance % (1000*60))/1000);
-
-document.getElementById("countdown").innerHTML =
-"⏳ Offer Ends In: " + hours + "h "
-+ minutes + "m " + seconds + "s ";
-
-if (distance < 0) {
-clearInterval(x);
-document.getElementById("countdown").innerHTML = "EXPIRED";
-}
-},1000);
-
+spinBtn.addEventListener("click", ()=>{
+  const prize = pickWeighted();
+  if(prize === "Subukan Muli"){
+    alert("Subukan muli kung may natitirang oras.");
+  }else{
+    alert("Nakakuha ka ng: " + prize);
+    window.location.href = SMARTLINK_URL;
+  }
+});
 </script>
 
 </body>
