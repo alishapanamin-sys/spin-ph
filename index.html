@@ -86,6 +86,7 @@
       border-left:15px solid transparent;
       border-right:15px solid transparent;
       border-bottom:30px solid rgba(255,255,255,.95);
+      filter:drop-shadow(0 6px 10px rgba(0,0,0,.25));
       z-index:3;
     }
     .wheel{
@@ -100,12 +101,16 @@
         #ffcf3a 300deg 360deg
       );
       transition:transform 4.2s cubic-bezier(.12,.74,.15,1);
+      box-shadow:0 18px 40px rgba(0,0,0,.25);
       position:relative;
+      overflow:hidden;
+      will-change: transform;
     }
     .hub{
-      position:absolute;
+      position:absolute; inset:auto;
       width:70px;height:70px;border-radius:50%;
       background:radial-gradient(circle at 30% 30%, #ffe7a8, #d7a637);
+      box-shadow: inset 0 0 0 10px rgba(255,255,255,.18), 0 10px 20px rgba(0,0,0,.25);
       left:50%; top:50%; transform:translate(-50%,-50%);
     }
     .label{
@@ -116,11 +121,13 @@
       font-weight:900;
       font-size:14px;
       color:#fff;
+      text-shadow:0 2px 10px rgba(0,0,0,.35);
       display:flex; align-items:center;
     }
     .label span{
       display:inline-block;
       transform:rotate(90deg);
+      letter-spacing:.4px;
     }
     .btn{
       position:absolute;
@@ -132,15 +139,49 @@
       font-weight:900;
       color:#fff;
       background:linear-gradient(180deg,var(--purple2),var(--purple));
+      box-shadow:0 12px 30px rgba(108,44,255,.45);
     }
+    .btn:disabled{opacity:.6; cursor:not-allowed}
     .fine{
       position:absolute;
       bottom:18px; left:0; right:0;
       text-align:center;
       font-size:11px;
       opacity:.85;
+      padding:0 16px;
     }
-    .fine a{color:#fff}
+    .fine a{color:rgba(255,255,255,.92); text-decoration:underline}
+
+    /* Modal */
+    .back{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.6);
+      display:none; align-items:center; justify-content:center;
+      padding:18px;
+    }
+    .modal{
+      width:min(360px, 100%);
+      background:rgba(18,18,28,.94);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      padding:16px;
+      text-align:center;
+      box-shadow:0 30px 90px rgba(0,0,0,.5);
+      backdrop-filter: blur(10px);
+      color:#fff;
+    }
+    .modal h3{margin:6px 0 10px}
+    .modal p{margin:0 0 14px; opacity:.92}
+    .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
+    .cbtn{
+      border:none; cursor:pointer;
+      border-radius:999px;
+      padding:12px 16px;
+      font-weight:900;
+      color:#fff;
+      background:linear-gradient(180deg,var(--purple2),var(--purple));
+    }
+    .cbtn.secondary{background:rgba(255,255,255,.10)}
   </style>
 </head>
 
@@ -150,7 +191,7 @@
       <div class="notch"></div>
 
       <div class="title">Philippines Lucky Spin 🇵🇭</div>
-      <div class="sub">I-spin upang malaman kung kwalipikado ka sa giveaway ngayon</div>
+      <div class="sub">I-spin upang tingnan kung kwalipikado ka sa giveaway ngayong araw</div>
 
       <div class="topbar">
         <div class="pill">⏳ Natitirang oras: <span id="timer">05:00</span></div>
@@ -159,6 +200,7 @@
       <div class="wheelWrap">
         <div class="pointer"></div>
         <div class="wheel" id="wheel">
+          <!-- 6 slices = 60deg each -->
           <div class="label" style="transform:translate(0,-50%) rotate(0deg)"><span>iPhone</span></div>
           <div class="label" style="transform:translate(0,-50%) rotate(60deg)"><span>Samsung</span></div>
           <div class="label" style="transform:translate(0,-50%) rotate(120deg)"><span>₱10,000</span></div>
@@ -172,55 +214,130 @@
       <button class="btn" id="spinBtn">I-SPIN NGAYON</button>
 
       <div class="fine">
-        <a href="#">Privacy</a> · <a href="#">Terms</a><br/>
+        <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a><br/>
         Hindi kaakibat ng Apple/Samsung. Para lamang sa mga residente ng Pilipinas.
       </div>
     </div>
   </div>
 
+  <div class="back" id="back" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3 id="mTitle">Resulta</h3>
+      <p id="mText">—</p>
+      <div class="row">
+        <button class="cbtn" id="claimBtn">MAGPATULOY</button>
+        <button class="cbtn secondary" id="closeBtn">Isara</button>
+      </div>
+    </div>
+  </div>
+
 <script>
-const SMARTLINK_URL = "PUT_YOUR_SMARTLINK_HERE";
+  // ====== EDIT THIS ======
+  const SMARTLINK_URL = "https://adsmain.bountyads.store/?utm_medium=24c9e8ead1a61abc4ca11515604da84dbebe69ba&utm_campaign=spent";
+  // =======================
 
-let remaining = 5 * 60;
-const timerEl = document.getElementById("timer");
-const spinBtn = document.getElementById("spinBtn");
+  // Countdown (5 minutes)
+  let remaining = 5 * 60; // seconds
+  const timerEl = document.getElementById("timer");
+  const spinBtn = document.getElementById("spinBtn");
 
-function tick(){
-  const m = String(Math.floor(remaining / 60)).padStart(2,"0");
-  const s = String(remaining % 60).padStart(2,"0");
-  timerEl.textContent = `${m}:${s}`;
-  if(remaining <= 0){ spinBtn.disabled = true; return; }
-  remaining--;
-  setTimeout(tick, 1000);
-}
-tick();
-
-const prizes = [
-  { name: "iPhone 15", weight: 4 },
-  { name: "Samsung Galaxy", weight: 6 },
-  { name: "Cash ₱10,000", weight: 10 },
-  { name: "Load", weight: 18 },
-  { name: "Data Bundle", weight: 18 },
-  { name: "Subukan Muli", weight: 44 }
-];
-
-function pickWeighted(){
-  const total = prizes.reduce((a,p)=>a+p.weight,0);
-  let r = Math.random()*total;
-  for(const p of prizes){ r-=p.weight; if(r<=0) return p.name;}
-  return prizes[prizes.length-1].name;
-}
-
-spinBtn.addEventListener("click", ()=>{
-  const prize = pickWeighted();
-  if(prize === "Subukan Muli"){
-    alert("Subukan muli kung may natitirang oras.");
-  }else{
-    alert("Nakakuha ka ng: " + prize);
-    window.location.href = SMARTLINK_URL;
+  function tick(){
+    const m = String(Math.floor(remaining / 60)).padStart(2,"0");
+    const s = String(remaining % 60).padStart(2,"0");
+    timerEl.textContent = `${m}:${s}`;
+    if(remaining <= 0){
+      spinBtn.disabled = true;
+      timerEl.textContent = "00:00";
+      return;
+    }
+    remaining--;
+    setTimeout(tick, 1000);
   }
-});
-</script>
+  tick();
 
+  // Weighted outcomes
+  const prizes = [
+    { name: "iPhone 15",         weight: 4  },
+    { name: "Samsung Galaxy",    weight: 6  },
+    { name: "Cash ₱10,000",      weight: 10 },
+    { name: "Load",              weight: 18 },
+    { name: "Data Bundle",       weight: 18 },
+    { name: "Subukan Muli",      weight: 44 }
+  ];
+
+  function pickWeighted(){
+    const total = prizes.reduce((a,p)=>a+p.weight,0);
+    let r = Math.random() * total;
+    for(const p of prizes){
+      r -= p.weight;
+      if(r <= 0) return p.name;
+    }
+    return prizes[prizes.length-1].name;
+  }
+
+  // Map prize to slice index (0..5)
+  const sliceMap = {
+    "iPhone 15": 0,
+    "Samsung Galaxy": 1,
+    "Cash ₱10,000": 2,
+    "Load": 3,
+    "Data Bundle": 4,
+    "Subukan Muli": 5
+  };
+
+  let spinning = false;
+  let rotation = 0;
+  const wheel = document.getElementById("wheel");
+
+  const back = document.getElementById("back");
+  const mTitle = document.getElementById("mTitle");
+  const mText  = document.getElementById("mText");
+  const claimBtn = document.getElementById("claimBtn");
+  const closeBtn = document.getElementById("closeBtn");
+
+  function openModal(title, text){
+    mTitle.textContent = title;
+    mText.textContent = text;
+    back.style.display = "flex";
+  }
+  function closeModal(){ back.style.display = "none"; }
+
+  closeBtn.addEventListener("click", closeModal);
+  back.addEventListener("click", (e)=>{ if(e.target === back) closeModal(); });
+
+  claimBtn.addEventListener("click", ()=>{ window.location.href = SMARTLINK_URL; });
+
+  spinBtn.addEventListener("click", ()=>{
+    if(spinning || remaining<=0) return;
+    spinning = true;
+
+    const prize = pickWeighted();
+    const idx = sliceMap[prize] ?? 5;
+
+    // 6 slices => 60deg each. centers at 30 + idx*60
+    const center = 30 + idx * 60;
+
+    // land at top pointer
+    const extraTurns = 6;
+    const target = (extraTurns * 360) - center;
+
+    rotation += target;
+    wheel.style.transform = `rotate(${rotation}deg)`;
+
+    setTimeout(()=>{
+      spinning = false;
+
+      if(prize === "Subukan Muli"){
+        openModal("Subukan Muli", "Maaari kang sumubok muli kung may natitirang oras.");
+        claimBtn.textContent = "OK";
+        claimBtn.onclick = ()=> closeModal();
+      }else{
+        openModal("Kwalipikado ✅", `Nakuha mo: ${prize}. Magpatuloy upang kumpirmahin ang iyong entry.`);
+        claimBtn.textContent = "MAGPATULOY";
+        claimBtn.onclick = ()=> window.location.href = SMARTLINK_URL;
+      }
+    }, 4300);
+  });
+</script>
 </body>
 </html>
